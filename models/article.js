@@ -10,6 +10,7 @@ var schema = new Schema({
   tags: Array,
   thumbsDown: Number,
   thumbsUp: Number,
+  votes: Object,
   title: String,
   url: String,
   version: String

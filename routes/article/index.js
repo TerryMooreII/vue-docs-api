@@ -37,6 +37,25 @@ exports.register = function(server, options, next) {
               });
             }
         }
+    }, {
+        method: 'PUT',
+        path: '/articles/{id}',
+        config: {
+            description: 'User required authorization',
+            auth: {
+                strategy: 'jwt',
+                scope: 'user'
+            },
+            handler: function(request, reply) {
+              Article.findByIdAndUpdate(request.params.id, request.payload, (error, article) => {
+                  if (!error) {
+                      reply(article); // HTTP 200
+                  } else {
+                      reply(Boom.forbidden(getErrorMessageFrom(error))); // HTTP 403
+                  }
+              });
+            }
+        }
     }]);
 
     next();
