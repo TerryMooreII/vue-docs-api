@@ -24,11 +24,22 @@ exports.register = function(server, options, next) {
                     query['tags'] = { "$all" : request.query.tags.split(',')}
                   }
                 }
-                console.log(query);
+
                 return reply(Article.find(query).sort('-submittedDate'));
             }
         }
     }, {
+        method: 'GET',
+        path: '/articles/{id}',
+        config: {
+            description: 'No required authorization.',
+            auth: false,
+            handler: function(request, reply) {
+
+                return reply(Article.findById(request.params.id));
+            }
+        }
+    },{
         method: 'POST',
         path: '/articles',
         config: {
