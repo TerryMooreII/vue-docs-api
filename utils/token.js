@@ -7,7 +7,7 @@ function createToken(user) {
     // Sign the JWT
     return jwt.sign(user, secret, {
         algorithm: 'HS256',
-        expiresIn: "1h"
+        expiresIn: "21d"
     });
 }
 
