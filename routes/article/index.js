@@ -3,6 +3,7 @@
 const Joi = require('joi');
 const Boom = require('boom');
 const Article = require('../../models/article');
+const Comment = require('../../models/comment');
 
 exports.register = function(server, options, next) {
 
@@ -35,11 +36,31 @@ exports.register = function(server, options, next) {
             description: 'No required authorization.',
             auth: false,
             handler: function(request, reply) {
-
-                return reply(Article.findById(request.params.id));
+                var article = Article.findById(request.params.id);
+                return reply(article);
             }
         }
-    },{
+    }, {
+        method: 'GET',
+        path: '/articles/{id}/comments',
+        config: {
+            description: 'No required authorization.',
+            auth: false,
+            handler: function(request, reply) {
+                var comments = Comment.find({
+                  articleId: request.params.id,
+                  parentId: null
+                }).populate({
+                  path: 'replies',
+                  populate:   {
+                    path: 'comment',
+                    model: Comment
+                  }
+                });
+                return reply(comments);
+            }
+        }
+    }, {
         method: 'POST',
         path: '/articles',
         config: {

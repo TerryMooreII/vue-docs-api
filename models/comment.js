@@ -6,8 +6,9 @@ var schema = new Schema({
   submittedBy: Schema.Types.ObjectId,
   submittedDate: Date,
   text: String,
+  isDeleted: Boolean,
   articleId: Schema.Types.ObjectId,
-  parentId: Schema.Types.ObjectId
+  replies: [Comment]
 });
 
 module.exports = mongoose.model('Comment', schema);

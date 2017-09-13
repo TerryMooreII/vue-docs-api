@@ -14,6 +14,7 @@ const Base = require('./routes/base');
 const User = require('./routes/user');
 const Example = require('./routes/example');
 const Article = require('./routes/article');
+const Comment = require('./routes/comment');
 
 //Config
 const config = require('./config');
@@ -81,7 +82,8 @@ server.register(
         Base,
         Example,
         User,
-        Article
+        Article,
+        Comment
     ],
     (err) => {
 
