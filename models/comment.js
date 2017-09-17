@@ -1,14 +1,15 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
-const User = require('./user');
 
 var schema = new Schema({
-  submittedBy: Schema.Types.ObjectId,
-  submittedDate: Date,
+  author: { type: Schema.Types.ObjectId, ref: 'User' },
+  posted: Date,
   text: String,
+  parentId: Schema.Types.ObjectId,
   isDeleted: Boolean,
   articleId: Schema.Types.ObjectId,
-  replies: [Comment]
+  slug: String,
+  fullSlug: String
 });
 
 module.exports = mongoose.model('Comment', schema);

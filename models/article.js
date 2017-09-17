@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema;
-const Comment = require('./comment')
 
 var schema = new Schema({
   author: String,
@@ -14,11 +13,7 @@ var schema = new Schema({
   votes: Object,
   title: String,
   url: String,
-  version: String,
-  comments: {
-        type: Schema.ObjectId,
-        ref: 'Comment'
-    }
+  version: String
 });
 
 module.exports = mongoose.model('Article', schema);

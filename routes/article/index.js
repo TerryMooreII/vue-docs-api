@@ -4,6 +4,7 @@ const Joi = require('joi');
 const Boom = require('boom');
 const Article = require('../../models/article');
 const Comment = require('../../models/comment');
+const User = require('../../models/user');
 
 exports.register = function(server, options, next) {
 
@@ -48,15 +49,8 @@ exports.register = function(server, options, next) {
             auth: false,
             handler: function(request, reply) {
                 var comments = Comment.find({
-                  articleId: request.params.id,
-                  parentId: null
-                }).populate({
-                  path: 'replies',
-                  populate:   {
-                    path: 'comment',
-                    model: Comment
-                  }
-                });
+                  articleId: request.params.id
+                }).populate('author', 'username').sort('fullSlug');
                 return reply(comments);
             }
         }
