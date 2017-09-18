@@ -48,9 +48,21 @@ exports.register = function(server, options, next) {
             description: 'No required authorization.',
             auth: false,
             handler: function(request, reply) {
-                var comments = Comment.find({
-                  articleId: request.params.id
-                }).populate('author', 'username').sort('fullSlug');
+                let comments
+                if (request.query.thread) {
+                  comments = Comment.find({
+                    articleId: request.params.id,
+                    slug: {
+                      $regex : new RegExp(`.*${request.query.thread}.*`, 'i')
+                    }
+                  })
+                } else {
+                  comments = Comment.find({
+                    articleId: request.params.id,
+                  })
+                }
+
+                comments.populate('author', 'username').sort('fullSlug');
                 return reply(comments);
             }
         }
