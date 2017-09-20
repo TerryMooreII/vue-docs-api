@@ -3,6 +3,7 @@
 const Joi = require('joi');
 const Boom = require('boom');
 const Comment = require('../../models/comment');
+const Article = require('../../models/article');
 
 exports.register = function(server, options, next) {
 
@@ -56,6 +57,7 @@ exports.register = function(server, options, next) {
         const fullSlugPart = `${getDateSlug()}:${slugPart}`;
         let slug;
         let fullSlug;
+
         var promise = new Promise((resolve, reject) => {
           if (parentId) {
             Comment.findById(parentId).then((parent) => {
@@ -71,6 +73,12 @@ exports.register = function(server, options, next) {
             });
           }
         }).then(slugs => {
+
+          return Article.findByIdAndUpdate(request.payload.articleId, {$inc:{commentCount: 1}}).then(()=> {
+            return slugs;
+          })
+        })
+        .then(slugs => {
           let comment = request.payload;
           comment.slug = slugs.slug;
           comment.fullSlug = slugs.fullSlug

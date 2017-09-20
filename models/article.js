@@ -13,7 +13,8 @@ var schema = new Schema({
   votes: Object,
   title: String,
   url: String,
-  version: String
+  version: String,
+  commentCount: Number
 });
 
 module.exports = mongoose.model('Article', schema);
