@@ -105,9 +105,6 @@ exports.register = function(server, options, next) {
         scope: 'user'
       },
       handler: function(request, reply) {
-        console.log(request.auth.credentials);
-        console.log(request.payload.author);
-
         if (request.auth.credentials._id !== request.payload.author._id){
           reply(Boom.forbidden()); // HTTP 403
           return;
