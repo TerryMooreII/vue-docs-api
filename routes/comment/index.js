@@ -105,7 +105,18 @@ exports.register = function(server, options, next) {
         scope: 'user'
       },
       handler: function(request, reply) {
-        Comment.findByIdAndUpdate(request.params.id, request.payload, (error, comment) => {
+        console.log(request.auth.credentials);
+        console.log(request.payload.author);
+
+        if (request.auth.credentials._id !== request.payload.author._id){
+          reply(Boom.forbidden()); // HTTP 403
+          return;
+        }
+
+        let updated = request.payload;
+        updated.isEdited = true;
+
+        Comment.findByIdAndUpdate(request.params.id, updated, (error, comment) => {
           if (!error) {
             reply(comment); // HTTP 200
           } else {

@@ -7,6 +7,7 @@ var schema = new Schema({
   text: String,
   parentId: Schema.Types.ObjectId,
   isDeleted: Boolean,
+  isEdited: Boolean,
   articleId: Schema.Types.ObjectId,
   slug: String,
   fullSlug: String
