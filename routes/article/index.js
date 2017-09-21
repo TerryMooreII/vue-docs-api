@@ -5,6 +5,7 @@ const Boom = require('boom');
 const Article = require('../../models/article');
 const Comment = require('../../models/comment');
 const User = require('../../models/user');
+const itemsPerPage = 25;
 
 exports.register = function(server, options, next) {
 
@@ -26,8 +27,11 @@ exports.register = function(server, options, next) {
                     query['tags'] = { "$all" : request.query.tags.split(',')}
                   }
                 }
-
-                return reply(Article.find(query).sort('-submittedDate'));
+                const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0
+                return reply(Article.find(query)
+                  .skip(page)
+                  .limit(request.query.count || itemsPerPage)
+                  .sort('-submittedDate'));
             }
         }
     }, {
