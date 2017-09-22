@@ -66,12 +66,12 @@ function getValidatedUser(request, reply) {
     const {username,password} = request.payload;
 
     User.findOne({
-          username: username
+          username: new RegExp(username, 'i')
       })
       .select('+password')
       .lean()
       .exec()
-      .then((user) => {         
+      .then((user) => {
           if (user && bcrypt.compareSync(password, user.password)) {
               delete user.password;
               reply(user);

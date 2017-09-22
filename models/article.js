@@ -8,13 +8,14 @@ var schema = new Schema({
   submittedDate: Date,
   type: String,
   tags: Array,
-  thumbsDown: Number,
-  thumbsUp: Number,
+  votesDown: Number,
+  votesUp: Number,
   votes: Object,
   title: String,
   url: String,
   version: String,
-  commentCount: Number
+  commentCount: Number,
+  isDeleted: Boolean
 });
 
 module.exports = mongoose.model('Article', schema);

@@ -74,7 +74,11 @@ exports.register = function(server, options, next) {
         method: 'POST',
         path: '/articles',
         config: {
-            description: 'User required authorization',
+            description: 'Create an article',
+            pre:[{
+              method:verifyUniqueArticle,
+              assign:'article'
+            }],
             auth: {
                 strategy: 'jwt',
                 scope: 'user'
@@ -118,3 +122,28 @@ exports.register = function(server, options, next) {
 exports.register.attributes = {
     name: 'articles'
 };
+
+function verifyUniqueArticle(request, reply) {
+  // Find an entry from the database that
+  // matches either the email or username
+  const daysForUniqueArticle = 2
+  var currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - daysForUniqueArticle);
+
+  Article.find({
+    $and: [
+      { url: request.payload.url },
+      { submittedDate: { $gt: new Date(currentDate) } }
+    ]
+  })
+  .sort('-submittedDate')
+  .then((article) => {
+    console.log(article);
+    if (article && article.length > 0) {
+      return reply(Boom.badRequest('Article has already been submitted'));
+    }
+    // If everything checks out, send the payload through
+    // to the route handler
+    reply(request.payload);
+  });
+}

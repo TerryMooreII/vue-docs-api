@@ -59,40 +59,44 @@ exports.register = function(server, options, next) {
         let fullSlug;
 
         var promise = new Promise((resolve, reject) => {
-          if (parentId) {
-            Comment.findById(parentId).then((parent) => {
-              resolve({
-                slug: parent.slug + '/' + slugPart,
-                fullSlug: parent.fullSlug + '/' + fullSlugPart
+            if (parentId) {
+              Comment.findById(parentId).then((parent) => {
+                resolve({
+                  slug: parent.slug + '/' + slugPart,
+                  fullSlug: parent.fullSlug + '/' + fullSlugPart
+                });
               });
-            });
-          } else {
-            resolve({
-              slug: slugPart,
-              fullSlug: fullSlugPart
-            });
-          }
-        }).then(slugs => {
-
-          return Article.findByIdAndUpdate(request.payload.articleId, {$inc:{commentCount: 1}}).then(()=> {
-            return slugs;
-          })
-        })
-        .then(slugs => {
-          let comment = request.payload;
-          comment.slug = slugs.slug;
-          comment.fullSlug = slugs.fullSlug
-          comment.posted = Date.now();
-
-          let saved = new Comment(comment);
-          saved.save(comment).then((response, error) => {
-            if (!error) {
-              reply(comment).created('/comment/' + saved._id); // HTTP 201
             } else {
-              reply(Boom.forbidden(error)); // HTTP 403
+              resolve({
+                slug: slugPart,
+                fullSlug: fullSlugPart
+              });
             }
+          }).then(slugs => {
+
+            return Article.findByIdAndUpdate(request.payload.articleId, {
+              $inc: {
+                commentCount: 1
+              }
+            }).then(() => {
+              return slugs;
+            })
+          })
+          .then(slugs => {
+            let comment = request.payload;
+            comment.slug = slugs.slug;
+            comment.fullSlug = slugs.fullSlug
+            comment.posted = Date.now();
+
+            let saved = new Comment(comment);
+            saved.save(comment).then((response, error) => {
+              if (!error) {
+                reply(comment).created('/comment/' + saved._id); // HTTP 201
+              } else {
+                reply(Boom.forbidden(error)); // HTTP 403
+              }
+            });
           });
-        });
       }
     }
   }, {
@@ -102,10 +106,10 @@ exports.register = function(server, options, next) {
       description: 'User required authorization',
       auth: {
         strategy: 'jwt',
-        scope: 'user'
+        scope: ['user']
       },
       handler: function(request, reply) {
-        if (request.auth.credentials._id !== request.payload.author._id){
+        if (request.auth.credentials._id !== request.payload.author._id) {
           reply(Boom.forbidden()); // HTTP 403
           return;
         }
@@ -114,6 +118,33 @@ exports.register = function(server, options, next) {
         updated.isEdited = true;
 
         Comment.findByIdAndUpdate(request.params.id, updated, (error, comment) => {
+          if (!error) {
+            reply(comment); // HTTP 200
+          } else {
+            reply(Boom.forbidden(error)); // HTTP 403
+          }
+        });
+      }
+    }
+  }, {
+    method: 'DELETE',
+    path: '/comments/{id}',
+    config: {
+      description: 'Admin or moderators required authorization',
+      auth: {
+        strategy: 'jwt',
+        scope: ['admin', 'moderator', 'user']
+      },
+      handler: function(request, reply) {
+        if (request.auth.scope === 'user' && request.auth.credentials._id !== request.payload.author._id) {
+          reply(Boom.forbidden()); // HTTP 403
+          return;
+        }
+
+        Comment.findByIdAndUpdate(request.params.id, {
+          text: '[DELETED]',
+          isDeleted: true
+        }, (error, comment) => {
           if (!error) {
             reply(comment); // HTTP 200
           } else {

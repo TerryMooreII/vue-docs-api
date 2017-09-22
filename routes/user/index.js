@@ -20,6 +20,7 @@ exports.register = (server, options, next) => {
             handler: (request, reply) => {
                 var newUser = request.payload;
                 newUser.password = bcrypt.hashSync(request.payload.password, 5);
+                newUser.createdDate = Date.now();
                 var user = new User(newUser);
                 if (!newUser.scope){
                   user.scope = ['user'];
@@ -73,14 +74,15 @@ function verifyUniqueUser(request, reply) {
   // matches either the email or username
   User.findOne({
     $or: [
-      { email: request.payload.email }
+      { email: request.payload.email },
+      { username: request.payload.username }
     ]
   }, (err, user) => {
     // Check whether the username or email
     // is already taken and error out if so
     if (user) {
-      if (user.email === request.payload.email) {
-        return reply(Boom.badRequest('Email taken'));
+      if (user.email === request.payload.email || user.username === request.payload.username) {
+        return reply(Boom.badRequest('Username or Email taken'));
       }
     }
     // If everything checks out, send the payload through
