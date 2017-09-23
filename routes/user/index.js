@@ -7,81 +7,84 @@ const bcrypt = require('bcrypt');
 
 exports.register = (server, options, next) => {
 
-    server.route([{
-        method: 'POST',
-        path: '/users',
-        config: {
-            description: 'User Save and registation',
-            auth: false,
-            pre:[{
-              method:verifyUniqueUser,
-              assign:'user'
-            }],
-            handler: (request, reply) => {
-                var newUser = request.payload;
-                newUser.password = bcrypt.hashSync(request.payload.password, 5);
-                newUser.createdDate = Date.now();
-                var user = new User(newUser);
-                if (!newUser.scope){
-                  user.scope = ['user'];
-                }
-                user.save((error) => {
-                    if (!error) {
-                        reply(user).created('/users/' + user._id); // HTTP 201
-                    } else {
-                        reply(Boom.forbidden(getErrorMessageFrom(error))); // HTTP 403
-                    }
-                });
-            }
+  server.route([{
+    method: 'POST',
+    path: '/users',
+    config: {
+      description: 'User Save and registation',
+      auth: false,
+      pre: [{
+        method: verifyUniqueUser,
+        assign: 'user'
+      }],
+      handler: (request, reply) => {
+        var newUser = request.payload;
+        newUser.password = bcrypt.hashSync(request.payload.password, 5);
+        newUser.createdDate = Date.now();
+        var user = new User(newUser);
+        if (!newUser.scope) {
+          user.scope = ['user'];
         }
-    },{
-        method: 'GET',
-        path: '/users/me',
-        config: {
-            description: 'Get My info',
-            auth: {
-                strategy: 'jwt',
-                scope: ['user', 'admin']
-            },
-            handler: (request, reply) => {
-              const email = request.auth.credentials.email;
-              if (!email){
-                reply(Boom.unauthorized('Invalid Token'))
-              }
-              User.findOne({
-                    email: email
-                })
-                .lean()
-                .exec()
-                .then((user) => {
-                    reply(user)
-                }).catch((error) => {
-                    reply(Boom.badRequest())
-                });
-            }
+        user.save((error) => {
+          if (!error) {
+            reply(user).created('/users/' + user._id); // HTTP 201
+          } else {
+            reply(Boom.forbidden(getErrorMessageFrom(error))); // HTTP 403
+          }
+        });
+      }
+    }
+  }, {
+    method: 'GET',
+    path: '/users/me',
+    config: {
+      description: 'Get My info',
+      auth: {
+        strategy: 'jwt',
+        scope: ['user', 'admin']
+      },
+      handler: (request, reply) => {
+        const email = request.auth.credentials.email;
+        if (!email) {
+          reply(Boom.unauthorized('Invalid Token'))
         }
-    }]);
+        User.findOne({
+            email: email
+          })
+          .lean()
+          .exec()
+          .then((user) => {
+            reply(user)
+          }).catch((error) => {
+            reply(Boom.badRequest())
+          });
+      }
+    }
+  }]);
 
-    next();
+  next();
 }
 
 exports.register.attributes = {
-    name: 'user'
+  name: 'user'
 };
 
 function verifyUniqueUser(request, reply) {
   // Find an entry from the database that
   // matches either the email or username
   User.findOne({
-    $or: [
-      { email: request.payload.email },
-      { username: request.payload.username }
+    $or: [{
+        email: new RegExp(request.payload.email, 'i')
+      },
+      {
+        username: new RegExp(request.payload.username, 'i')
+      }
     ]
   }, (err, user) => {
     // Check whether the username or email
     // is already taken and error out if so
     if (user) {
-      if (user.email === request.payload.email || user.username === request.payload.username) {
+      if (user.email.toLowerCase() === request.payload.email.toLowerCase() || user.username.toLowerCase() === request.payload.username.toLowerCase()) {
         return reply(Boom.badRequest('Username or Email taken'));
       }
     }

@@ -40,8 +40,8 @@ exports.register = function(server, options, next) {
               //return (votes - 1) / pow((item_hour_age+2), gravity)
               return reply(Article.aggregate([
                   {
-                    $project: {
-                      article: "$$ROOT",
+                    $addFields: {
+                      //article: "$$ROOT",
                       ranking: { $divide: [
                         { $subtract: [ "$votesUp", "$votesDown" ] },  //Total Votes
                         { $pow: [
@@ -164,7 +164,7 @@ exports.register = function(server, options, next) {
 
       Article.find({
           $and: [{
-              url: request.payload.url
+              url: new RegExp(request.payload.url, 'i')
             },
             {
               submittedDate: {
@@ -175,9 +175,8 @@ exports.register = function(server, options, next) {
         })
         .sort('-submittedDate')
         .then((article) => {
-          console.log(article);
           if (article && article.length > 0) {
-            return reply(Boom.badRequest('Article has already been submitted'));
+            return reply(Boom.badRequest('Thanks but this article has already been submitted recently.'));
           }
           // If everything checks out, send the payload through
           // to the route handler
