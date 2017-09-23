@@ -49,7 +49,7 @@ exports.register = function(server, options, next) {
       description: 'User required authorization',
       auth: {
         strategy: 'jwt',
-        scope: 'user'
+        scope: ['user', 'admin', 'moderator']
       },
       handler: function(request, reply) {
         const parentId = request.payload.parentId;
@@ -106,7 +106,7 @@ exports.register = function(server, options, next) {
       description: 'User required authorization',
       auth: {
         strategy: 'jwt',
-        scope: ['user']
+        scope: ['user', 'admin', 'moderator']
       },
       handler: function(request, reply) {
         if (request.auth.credentials._id !== request.payload.author._id) {
