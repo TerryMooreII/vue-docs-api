@@ -5,7 +5,7 @@ const Boom = require('boom');
 const Article = require('../../models/article');
 const Comment = require('../../models/comment');
 const User = require('../../models/user');
-const itemsPerPage = 25;
+const itemsPerPage = 20;
 
 exports.register = function(server, options, next) {
 

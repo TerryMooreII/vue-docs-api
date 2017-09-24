@@ -1,8 +1,8 @@
 {
-  "name": "hapi-jwt-mongo",
-  "description": "Starter project for hapi authentication with JWT and Mongo",
-  "version": "0.0.1",
-  "author": "Terry Moore",
+  "name": "vuedocs-api",
+  "description": "Api that powers Vuedocs.io",
+  "version": "0.0.2",
+  "author": "Terry Moore II",
   "private": true,
   "main": "server.js",
   "engines": {
