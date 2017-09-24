@@ -33,9 +33,9 @@ exports.register = function(server, options, next) {
 
             if (request.query.tags || request.query.q || request.query.latest){
               return reply(Article.find(query)
+                .sort('-submittedDate')
                 .skip(page * itemsPerPage)
-                .limit(request.query.count || itemsPerPage)
-                .sort('-submittedDate'));
+                .limit(request.query.count || itemsPerPage));
             } else {
               //return (votes - 1) / pow((item_hour_age+2), gravity)
               return reply(Article.aggregate([
@@ -56,9 +56,9 @@ exports.register = function(server, options, next) {
                     }
                   }
                 ])
+                .sort('-ranking')
                 .skip(page * itemsPerPage)
-                .limit(request.query.count || itemsPerPage)
-                .sort('-ranking'))
+                .limit(request.query.count || itemsPerPage));
               }
             }
           }
