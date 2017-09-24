@@ -1,7 +1,7 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const secret = require('../config').token.secret;
+const secret = process.env.TOKEN_SECRET;
 
 function createToken(user) {
     // Sign the JWT

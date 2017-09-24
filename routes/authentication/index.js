@@ -10,7 +10,7 @@ const Hoek = require('hoek');
 const bcrypt = require('bcrypt');
 const User = require('../../models/user');
 const token = require('../../utils/token');
-const secret = require('../../config').token.secret
+const secret = process.env.TOKEN_SECRET;
 
 exports.register = (server, options, next) => {
 

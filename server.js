@@ -3,6 +3,8 @@
 /**
  * Dependencies.
  */
+require('dotenv').config();
+
 const AuthJwt = require('hapi-auth-jwt');
 const Good = require('good');
 const Hapi = require('hapi');
@@ -16,8 +18,6 @@ const Example = require('./routes/example');
 const Article = require('./routes/article');
 const Comment = require('./routes/comment');
 
-//Config
-const config = require('./config');
 
 // Create a new server
 const server = new Hapi.Server();
@@ -25,17 +25,16 @@ const server = new Hapi.Server();
 Mongoose.Promise = global.Promise;
 
 Mongoose.connect('mongodb://' +
-  config.db.username + ':' +
-  config.db.password + '@' +
-  config.db.hostname + ':' +
-  config.db.port + '/' +
-  config.db.database);
+  process.env.DB_USERNAME + ':' +
+  process.env.DB_PASSWORD + '@' +
+  process.env.DB_HOSTNAME + ':' +
+  process.env.DB_PORT + '/' +
+  process.env.DB_DATABASE);
 
 
 // Setup the server with a host and port
 server.connection({
   port: parseInt(process.env.PORT, 10) || 3000,
-  host: '0.0.0.0',
   router: {
     stripTrailingSlash: true
   },
