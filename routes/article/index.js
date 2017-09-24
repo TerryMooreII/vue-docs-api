@@ -29,11 +29,11 @@ exports.register = function(server, options, next) {
                 }
               }
             }
-            const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0
+            const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0;
 
             if (request.query.tags || request.query.q || request.query.latest){
               return reply(Article.find(query)
-                .skip(page)
+                .skip(page * itemsPerPage)
                 .limit(request.query.count || itemsPerPage)
                 .sort('-submittedDate'));
             } else {
@@ -56,7 +56,7 @@ exports.register = function(server, options, next) {
                     }
                   }
                 ])
-                .skip(page)
+                .skip(page * itemsPerPage)
                 .limit(request.query.count || itemsPerPage)
                 .sort('-ranking'))
               }
