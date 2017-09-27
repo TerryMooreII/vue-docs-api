@@ -8,8 +8,9 @@ const client = new Twitter({
 });
 
 const vuedocsUrl = 'https://vuedocs.io/articles/'
+const hashTags = ['#vue', '#vuejs', '#javascript'].join(' ');
 
 exports.tweet =  function tweet (title, id) {
-  const status = `${title} ${vuedocsUrl}${id}`
+  const status = `${title} ${vuedocsUrl}${id} ${hashTags}`
   return client.post('statuses/update', {status: status})
 }
