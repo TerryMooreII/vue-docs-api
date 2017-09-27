@@ -7,7 +7,7 @@ const client = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-const vuedocsUrl = 'https://vuedocs.io/'
+const vuedocsUrl = 'https://vuedocs.io/articles/'
 
 exports.tweet =  function tweet (title, id) {
   const status = `${title} ${vuedocsUrl}${id}`
