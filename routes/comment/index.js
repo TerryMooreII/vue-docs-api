@@ -14,21 +14,7 @@ exports.register = function(server, options, next) {
       description: 'No required authorization.',
       auth: false,
       handler: function(request, reply) {
-        let query = {};
-        if (request.query) {
-          if (request.query.q) {
-            query['title'] = {
-              $regex: new RegExp(`.*${request.query.q}.*`, 'i')
-            }
-          }
-          if (request.query.tags) {
-            query['tags'] = {
-              "$all": request.query.tags.split(',')
-            }
-          }
-        }
-
-        return reply(Comment.find(query).sort('-submittedDate'));
+        return reply(Comment.find({}).sort('-submittedDate'));
       }
     }
   }, {

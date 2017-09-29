@@ -33,7 +33,7 @@ exports.register = function(server, options, next) {
           }
           const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0;
 
-          if (request.query.tags || request.query.q || request.query.latest) {
+          if (request.query.tags || request.query.q || request.query.orderby) {
             return reply(Article.find(query)
               .sort('-submittedDate')
               .skip(page * itemsPerPage)
