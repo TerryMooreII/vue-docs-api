@@ -29,7 +29,8 @@ exports.register = (server, options, next) => {
     password: 'cookie_encryption_password_secure',
     clientId: process.env.TWITTER_CONSUMER_KEY,
     clientSecret: process.env.TWITTER_CONSUMER_SECRET,
-    isSecure: false // process.env.NODE_ENV === 'production'
+    isSecure: false, // process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production'
   });
 
   server.auth.strategy('google', 'bell', {
@@ -37,7 +38,8 @@ exports.register = (server, options, next) => {
     password: 'cookie_encryption_password_secure',
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    isSecure: false // process.env.NODE_ENV === 'production'
+    isSecure: false, // process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production'
   });
 
   server.auth.strategy('github', 'bell', {
@@ -45,7 +47,8 @@ exports.register = (server, options, next) => {
     password: 'cookie_encryption_password_secure',
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    isSecure: false // process.env.NODE_ENV === 'production'
+    isSecure: false, // process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production'
   });
 
   server.route({
