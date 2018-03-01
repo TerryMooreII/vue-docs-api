@@ -34,13 +34,15 @@ exports.register = function(server, options, next) {
           const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0;
 
           if (request.query.tags || request.query.q || request.query.orderby) {
-            return reply(Article.find(query)
-              .sort('-submittedDate')
-              .skip(page * itemsPerPage)
-              .limit(request.query.count || itemsPerPage));
+            reply(Article.find(query)
+            .populate('submittedBy')
+            .sort('-submittedDate')
+            .skip(page * itemsPerPage)
+            .limit(request.query.count || itemsPerPage)
+            .exec());
           } else {
             //return (votes - 1) / pow((item_hour_age+2), gravity)
-            return reply(Article.aggregate([{
+            return Article.aggregate([{
                 $addFields: {
                   //article: "$$ROOT",
                   ranking: {
@@ -67,7 +69,13 @@ exports.register = function(server, options, next) {
               }])
               .sort('-ranking')
               .skip(page * itemsPerPage)
-              .limit(request.query.count || itemsPerPage));
+              .limit(request.query.count || itemsPerPage)
+              .exec((err, result) => {
+                return Article.populate(result, {path: "submittedBy"}).then(data => {
+                  console.log(data)
+                  reply(data)
+                })
+              });
           }
         }
       }
@@ -79,7 +87,7 @@ exports.register = function(server, options, next) {
         description: 'No required authorization.',
         auth: false,
         handler: function(request, reply) {
-          var article = Article.findById(request.params.id);
+          var article = Article.findById(request.params.id).lean();
           return reply(article);
         }
       }

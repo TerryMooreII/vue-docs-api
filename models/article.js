@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 var schema = new Schema({
   author: String,
   publishedDate: Date,
-  submittedBy: String,
+  submittedBy: { type: Schema.Types.ObjectId, ref: 'User' },
   submittedDate: Date,
   type: String,
   tags: Array,
