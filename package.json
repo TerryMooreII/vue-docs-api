@@ -24,6 +24,7 @@
     "hapi-auth-jwt": "^4.0.0",
     "hoek": "^4.2.0",
     "joi": "^10.6.0",
+    "jsonwebtoken": "^8.1.1",
     "mongoose": "^4.11.11",
     "twitter": "^1.7.1"
   }
