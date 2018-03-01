@@ -44,13 +44,12 @@ exports.register = (server, options, next) => {
         scope: ['user', 'admin']
       },
       handler: (request, reply) => {
-        const email = request.auth.credentials.email;
-        if (!email) {
+        const id = request.auth.credentials._id;
+        
+        if (!id) {
           reply(Boom.unauthorized('Invalid Token'))
         }
-        User.findOne({
-            email: email
-          })
+        User.findById(id)
           .lean()
           .exec()
           .then((user) => {

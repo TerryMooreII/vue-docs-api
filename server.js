@@ -10,6 +10,7 @@ const Good = require('good');
 const Hapi = require('hapi');
 const Hoek = require('hoek');
 const Mongoose = require('mongoose');
+const Bell = require('bell');
 
 const Authentication = require('./routes/authentication');
 const Base = require('./routes/base');
@@ -75,6 +76,7 @@ server.register(
       }
     },
     AuthJwt,
+    Bell,
 
     //Routes
     Authentication,
