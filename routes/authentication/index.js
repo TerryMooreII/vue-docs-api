@@ -29,7 +29,7 @@ exports.register = (server, options, next) => {
     password: 'cookie_encryption_password_secure',
     clientId: process.env.TWITTER_CONSUMER_KEY,
     clientSecret: process.env.TWITTER_CONSUMER_SECRET,
-    isSecure: process.env.NODE_ENV === 'production'
+    isSecure: false // process.env.NODE_ENV === 'production'
   });
 
   server.auth.strategy('google', 'bell', {
@@ -37,7 +37,7 @@ exports.register = (server, options, next) => {
     password: 'cookie_encryption_password_secure',
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    isSecure: process.env.NODE_ENV === 'production'
+    isSecure: false // process.env.NODE_ENV === 'production'
   });
 
   server.auth.strategy('github', 'bell', {
@@ -119,7 +119,7 @@ function oauthHandler (request, reply) {
   if (!request.auth.isAuthenticated) {
     return reply('Authentication failed due to: ' + request.auth.error.message);
   }
-  console.log(request.auth.credentials)
+
   getOauthUser(request, reply);
 }
 
