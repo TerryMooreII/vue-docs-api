@@ -8,7 +8,7 @@ var schema = new Schema({
   parentId: Schema.Types.ObjectId,
   isDeleted: Boolean,
   isEdited: Boolean,
-  articleId: Schema.Types.ObjectId,
+  articleId: { type: Schema.Types.ObjectId, ref: 'Article' },
   slug: String,
   fullSlug: String
 });

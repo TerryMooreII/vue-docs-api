@@ -5,6 +5,8 @@ const Boom = require('boom');
 const Comment = require('../../models/comment');
 const Article = require('../../models/article');
 
+const itemsPerPage = 20;
+
 exports.register = function(server, options, next) {
 
   server.route([{
@@ -14,7 +16,14 @@ exports.register = function(server, options, next) {
       description: 'No required authorization.',
       auth: false,
       handler: function(request, reply) {
-        return reply(Comment.find({}).sort('-submittedDate'));
+        const page = request.query.page && !isNaN(request.query.page) && request.query.page > 1 ? request.query.page - 1 : 0;
+
+        return reply(Comment.find({})
+          .skip(page * itemsPerPage)
+          .limit(request.query.count || itemsPerPage)
+          .populate('articleId')
+          .populate('author')
+          .sort('-posted'));
       }
     }
   }, {
