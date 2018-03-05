@@ -15,10 +15,8 @@ const Bell = require('bell');
 const Authentication = require('./routes/authentication');
 const Base = require('./routes/base');
 const User = require('./routes/user');
-const Example = require('./routes/example');
 const Article = require('./routes/article');
 const Comment = require('./routes/comment');
-
 
 // Create a new server
 const server = new Hapi.Server();
