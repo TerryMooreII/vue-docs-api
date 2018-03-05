@@ -129,6 +129,7 @@ function oauthHandler (request, reply) {
 function getOauthUser(request, reply) {
   const oauthId = `${request.auth.credentials.provider}|${request.auth.credentials.profile.id}`;  
   const redirectUrl = process.env.WEB_URL;
+  console.log(JSON.stringify(request.auth.credentials, null, 2));
   OauthUser.findOne({
     id: oauthId
   })
@@ -140,9 +141,34 @@ function getOauthUser(request, reply) {
         .exec()
         .then(data => reply().redirect(`${redirectUrl}#id_token=${token.createToken(data)}`));
     } else {
-      var newUser = {
-        username: request.auth.credentials.profile.username || request.auth.credentials.profile.displayName,
+      let newUser = {
+        
+      };
+      switch (request.auth.credentials.provider) {
+        case 'google':
+        const email = request.auth.credentials.profile.email.split('@');
+        newUser = {
+          username: email[0],
+          displayName: request.auth.credentials.profile.displayName,
+          profileImage: request.auth.credentials.profile.raw.picture
+        };
+          break;
+        case 'github':
+          newUser = {
+            username: request.auth.credentials.profile.username,
+            displayName: request.auth.credentials.profile.displayName,
+            profileImage: request.auth.credentials.profile.raw.avatar_url
+          };
+          break;
+        case 'twitter':
+          newUser = {
+            username: request.auth.credentials.profile.username,
+            displayName: request.auth.credentials.profile.displayName,
+            profileImage: request.auth.credentials.profile.raw.profile_image_url_https
+          };
+          break;
       }
+      
       newUser.createdDate = Date.now();
       var user = new User(newUser);
       if (!newUser.scope) {

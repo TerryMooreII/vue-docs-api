@@ -6,6 +6,8 @@ var schema = new Schema({
     last: String,
     email: String,
     username: String,
+    displayName: String,
+    profileImage: String,
     password: { type: String, select: false },
     createdDate: Date,
     scope:Array,

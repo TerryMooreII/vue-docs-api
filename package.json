@@ -9,6 +9,7 @@
     "node": "v6.9.0"
   },
   "scripts": {
+    "dev": "nodemon",
     "start": "node server.js"
   },
   "dependencies": {

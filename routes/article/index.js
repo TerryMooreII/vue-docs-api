@@ -72,7 +72,6 @@ exports.register = function(server, options, next) {
               .limit(request.query.count || itemsPerPage)
               .exec((err, result) => {
                 return Article.populate(result, {path: "submittedBy"}).then(data => {
-                  console.log(data)
                   reply(data)
                 })
               });
