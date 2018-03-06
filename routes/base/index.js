@@ -1,34 +1,27 @@
-'use strict';
-
 const Boom = require('boom');
 
-exports.register = (server, options, next) => {
-
+const register = async (server) => {
   server.route([{
     method: 'GET',
     path: '/',
     config: {
       auth: false,
-      handler: (request, reply) => {
-        reply({
-          status: 'ok'
-        });
-      }
-    }
+      handler: () => ({
+        status: 'ok',
+      }),
+    },
   }, {
     method: 'GET',
     path: '/{path*}',
     config: {
       auth: false,
-      handler: (request, reply) => {
-        reply(Boom.notFound());
-      }
-    }
+      handler: () => Boom.notFound(),
+    },
   }]);
-
-  next();
-}
-
-exports.register.attributes = {
-  name: 'base'
 };
+
+module.exports = {
+  register,
+  name: 'base',
+};
+

@@ -1,27 +1,23 @@
-'use strict';
-
-/**
- * Dependencies.
- */
 const Joi = require('joi');
 const Boom = require('boom');
-const Promise = require('bluebird');
-const Hoek = require('hoek');
 const bcrypt = require('bcrypt');
 const User = require('../../models/user');
 const OauthUser = require('../../models/oauth-user');
 const token = require('../../utils/token');
+
 const secret = process.env.TOKEN_SECRET;
 
-exports.register = (server, options, next) => {
-
-  //This sets up out JWT authorization strategy
-  //Access JWT user info at request.auth.credentials
+const register = async (server) => {
+  // This sets up out JWT authorization strategy
+  // Access JWT user info at request.auth.credentials
   server.auth.strategy('jwt', 'jwt', {
     key: secret,
+    validate: async (decoded, request) => {
+      return { isValid: true };
+    },
     verifyOptions: {
-      algorithms: ['HS256']
-    }
+      algorithms: ['HS256'],
+    },
   });
 
   server.auth.strategy('twitter', 'bell', {
@@ -30,7 +26,7 @@ exports.register = (server, options, next) => {
     clientId: process.env.TWITTER_CONSUMER_KEY,
     clientSecret: process.env.TWITTER_CONSUMER_SECRET,
     isSecure: false, // process.env.NODE_ENV === 'production'
-    forceHttps: process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production',
   });
 
   server.auth.strategy('google', 'bell', {
@@ -39,7 +35,7 @@ exports.register = (server, options, next) => {
     clientId: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     isSecure: false, // process.env.NODE_ENV === 'production'
-    forceHttps: process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production',
   });
 
   server.auth.strategy('github', 'bell', {
@@ -48,178 +44,174 @@ exports.register = (server, options, next) => {
     clientId: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
     isSecure: false, // process.env.NODE_ENV === 'production'
-    forceHttps: process.env.NODE_ENV === 'production'
+    forceHttps: process.env.NODE_ENV === 'production',
   });
 
   server.route({
     method: ['GET', 'POST'], // Must handle both GET and POST
-    path: '/oauth/twitter',   // The callback endpoint registered with the provider
-    config: {
-        auth: 'twitter',
-        handler: oauthHandler
-    }
+    path: '/oauth/twitter', // The callback endpoint registered with the provider
+    options: {
+      auth: 'twitter',
+      handler: oauthHandler,
+    },
   });
 
   server.route({
     method: ['GET', 'POST'], // Must handle both GET and POST
-    path: '/oauth/google',   // The callback endpoint registered with the provider
-    config: {
-        auth: 'google',
-        handler: oauthHandler
-    }
+    path: '/oauth/google', // The callback endpoint registered with the provider
+    options: {
+      auth: 'google',
+      handler: oauthHandler,
+    },
   });
 
   server.route({
     method: ['GET', 'POST'], // Must handle both GET and POST
-    path: '/oauth/github',   // The callback endpoint registered with the provider
-    config: {
-        auth: 'github',
-        handler: oauthHandler
-    }
+    path: '/oauth/github', // The callback endpoint registered with the provider
+    options: {
+      auth: 'github',
+      handler: oauthHandler,
+    },
   });
 
   server.route([{
     method: 'POST',
     path: '/login',
-    config: {
+    options: {
       auth: false,
       validate: {
         payload: {
           username: Joi.string().required(),
-          password: Joi.string().min(2).max(200).required()
-        }
+          password: Joi.string().min(2).max(200).required(),
+        },
       },
       pre: [{
         method: getValidatedUser,
-        assign: 'user'
+        assign: 'user',
       }],
-      handler: (request, reply) => {
-        reply({
-          user: request.pre.user,
-          id_token: token.createToken(request.pre.user)
-        });
-      }
-    }
+      handler: request => ({
+        user: request.pre.user,
+        id_token: token.createToken(request.pre.user),
+      }),
+    },
   }, {
     method: 'GET',
     path: '/logout',
     config: {
       auth: false,
-      handler: (request, reply) => {
-        return reply('Logout Successful!');
-      }
-    }
+      handler: () => 'Logout Successful!',
+    },
   }]);
-
-  next();
-}
-
-exports.register.attributes = {
-  name: 'auth'
 };
 
-function oauthHandler (request, reply) {
+module.exports = {
+  register,
+  name: 'auth',
+};
+
+const oauthHandler = async (request, h) => {
   if (!request.auth.isAuthenticated) {
-    return reply('Authentication failed due to: ' + request.auth.error.message);
+    return `Authentication failed due to: ${request.auth.error.message}`;
   }
 
-  getOauthUser(request, reply);
+  return getOauthUser(request, h);
 }
 
-function getOauthUser(request, reply) {
-  const oauthId = `${request.auth.credentials.provider}|${request.auth.credentials.profile.id}`;  
+async function getOauthUser(request, h) {
+  const oauthId = `${request.auth.credentials.provider}|${request.auth.credentials.profile.id}`;
   const redirectUrl = process.env.WEB_URL;
-  console.log(JSON.stringify(request.auth.credentials, null, 2));
-  OauthUser.findOne({
-    id: oauthId
-  })
-  .exec()
-  .then((oauthUser) => {
+  try {
+    const oauthUser = await OauthUser.findOne({
+      id: oauthId,
+    }).exec();
+
     if (oauthUser) {
-      User.findById(oauthUser.user)
+      const data = await User.findById(oauthUser.user)
         .lean()
-        .exec()
-        .then(data => reply().redirect(`${redirectUrl}#id_token=${token.createToken(data)}`));
-    } else {
-      let newUser = {
-        
-      };
-      switch (request.auth.credentials.provider) {
-        case 'google':
+        .exec();
+
+      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`)
+    } 
+    let newUser = {};
+
+    switch (request.auth.credentials.provider) {
+      case 'google':
         const email = request.auth.credentials.profile.email.split('@');
         newUser = {
           username: email[0],
           displayName: request.auth.credentials.profile.displayName,
-          profileImage: request.auth.credentials.profile.raw.picture
+          profileImage: request.auth.credentials.profile.raw.picture,
         };
-          break;
-        case 'github':
-          newUser = {
-            username: request.auth.credentials.profile.username,
-            displayName: request.auth.credentials.profile.displayName,
-            profileImage: request.auth.credentials.profile.raw.avatar_url
-          };
-          break;
-        case 'twitter':
-          newUser = {
-            username: request.auth.credentials.profile.username,
-            displayName: request.auth.credentials.profile.displayName,
-            profileImage: request.auth.credentials.profile.raw.profile_image_url_https
-          };
-          break;
-      }
-      
-      newUser.createdDate = Date.now();
-      var user = new User(newUser);
-      if (!newUser.scope) {
-        user.scope = ['user'];
-      }
-      user.save((error) => {
-        if (!error) {
-          const newOauthUser = new OauthUser({
-            id: oauthId,
-            user
-          })
-          newOauthUser.save((error, savedUser) => {
-            if (!error) {
-              User.findById(savedUser.user)
-                .lean()
-                .exec()
-                .then(data => reply().redirect(`${redirectUrl}#id_token=${token.createToken(data)}`));
-            } else {
-              reply(Boom.forbidden(getErrorMessageFrom(error))); // HTTP 403
-            }
-          })
-        } else {
-          reply(Boom.forbidden(getErrorMessageFrom(error))); // HTTP 403
-        }
-      });
+        break;
+      case 'github':
+        newUser = {
+          username: request.auth.credentials.profile.username,
+          displayName: request.auth.credentials.profile.displayName,
+          profileImage: request.auth.credentials.profile.raw.avatar_url,
+        };
+        break;
+      case 'twitter':
+        newUser = {
+          username: request.auth.credentials.profile.username,
+          displayName: request.auth.credentials.profile.displayName,
+          profileImage: request.auth.credentials.profile.raw.profile_image_url_https,
+        };
+        break;
+      default:
+        break;
     }
-  }).catch((error) => {
-    reply(Boom.badRequest('Oauth Login Failed!'));
-  });
+
+    newUser.createdDate = Date.now();
+    const user = new User(newUser);
+
+    if (!newUser.scope) {
+      user.scope = ['user'];
+    }
+    try {
+      await user.save();
+
+      const newOauthUser = new OauthUser({
+        id: oauthId,
+        user,
+      });
+
+      const savedUser = await newOauthUser.save();
+
+      const data = await User.findById(savedUser.user)
+        .lean()
+        .exec();
+
+      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`)
+    } catch (error) {
+      return Boom.forbidden(error); // HTTP 403
+    }
+  } catch (error) {
+    return Boom.badRequest(error);
+  }
 }
 
-function getValidatedUser(request, reply) {
+const getValidatedUser = async (request, h) => {
   const {
     username,
-    password
+    password,
   } = request.payload;
 
-  User.findOne({
-      username: new RegExp(username, 'i')
+  try {
+    const user = await User.findOne({
+      username: new RegExp(username, 'i'),
     })
-    .select('+password')
-    .lean()
-    .exec()
-    .then((user) => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        delete user.password;
-        reply(user);
-      } else {
-        reply(Boom.badRequest('Incorrect password!'));
-      }
-    }).catch((error) => {
-      reply(Boom.badRequest('Incorrect password!'))
-    });
-}
+      .select('+password')
+      .lean()
+      .exec();
+
+    if (user && bcrypt.compareSync(password, user.password)) {
+      delete user.password;
+      return user;
+    }
+
+    return Boom.badRequest('Incorrect password!');
+  } catch (error) {
+    return Boom.badRequest(error);
+  }
+};
+

@@ -1,7 +1,8 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
-var schema = new Schema({
+const schema = new Schema({
   author: String,
   publishedDate: Date,
   submittedBy: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -15,7 +16,7 @@ var schema = new Schema({
   url: String,
   version: String,
   commentCount: Number,
-  isDeleted: Boolean
+  isDeleted: Boolean,
 });
 
 module.exports = mongoose.model('Article', schema);

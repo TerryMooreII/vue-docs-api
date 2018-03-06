@@ -1,9 +1,10 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
-var schema = new Schema({
+const schema = new Schema({
   user: { type: Schema.Types.ObjectId, ref: 'User' },
-  id: String
+  id: String,
 });
 
 module.exports = mongoose.model('OauthUser', schema);

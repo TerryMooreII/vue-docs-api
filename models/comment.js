@@ -1,7 +1,8 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+
 const Schema = mongoose.Schema;
 
-var schema = new Schema({
+const schema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User' },
   posted: Date,
   text: String,
@@ -10,7 +11,7 @@ var schema = new Schema({
   isEdited: Boolean,
   articleId: { type: Schema.Types.ObjectId, ref: 'Article' },
   slug: String,
-  fullSlug: String
+  fullSlug: String,
 });
 
 module.exports = mongoose.model('Comment', schema);
