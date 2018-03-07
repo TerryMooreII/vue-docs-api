@@ -12,6 +12,8 @@ const Base = require('./routes/base');
 const User = require('./routes/user');
 const Article = require('./routes/article');
 const Comment = require('./routes/comment');
+const Userinfo = require('./routes/userinfo');
+const ArticleComments = require('./routes/article-comments');
 
 // Create a new server
 const server = new Hapi.Server({
@@ -64,6 +66,8 @@ async function start() {
     await server.register(Base);
     await server.register(Article);
     await server.register(Comment);
+    await server.register(Userinfo);
+    await server.register(ArticleComments);
 
     // Hoek.assert(!err, err);
     await server.start();

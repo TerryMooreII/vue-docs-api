@@ -1,6 +1,5 @@
 const ArticleService = require('./article.service');
 const ArticleValidator = require('./article.validator');
-const Comment = require('../../models/comment');
 
 const register = async (server) => {
   server.route([{
@@ -19,33 +18,6 @@ const register = async (server) => {
       description: 'No required authorization.',
       auth: false,
       handler: ArticleService.get,
-    },
-  },
-  {
-    method: 'GET',
-    path: '/articles/{id}/comments',
-    options: {
-      description: 'No required authorization.',
-      auth: false,
-      handler(request) {
-        let comments;
-        if (request.query.thread) {
-          comments = Comment.find({
-            articleId: request.params.id,
-            slug: {
-              $regex: new RegExp(`.*${request.query.thread}.*`, 'i'),
-            },
-          });
-        } else {
-          comments = Comment.find({
-            articleId: request.params.id,
-          });
-        }
-
-        comments.populate('author', 'username').sort('fullSlug');
-
-        return comments;
-      },
     },
   },
   {
