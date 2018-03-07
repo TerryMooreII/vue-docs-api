@@ -1,3 +1,5 @@
+const Boom = require('boom');
+const Article = require('../../models/article');
 
 const verifyUniqueArticle = async (request) => {
   // Find an entry from the database that
@@ -31,4 +33,4 @@ const verifyUniqueArticle = async (request) => {
 
 module.exports = {
   verifyUniqueArticle
-}
+};

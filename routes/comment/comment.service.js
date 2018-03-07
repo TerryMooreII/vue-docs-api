@@ -15,7 +15,7 @@ const getDateSlug = () => {
 
 const getAll = async (request) => {
   const page = request.query.page &&
-  !isNaN(request.query.page) &&
+  !Number.isNaN(request.query.page) &&
   request.query.page > 1 ? request.query.page - 1 : 0;
 
   return Comment.find({})
@@ -28,7 +28,7 @@ const getAll = async (request) => {
 
 const get = async request => Comment.findById(request.params.id);
 
-const post = async (request, h) => { 
+const post = async (request, h) => {
   const { parentId } = request.payload;
   const slugPart = getSlug(4);
   const fullSlugPart = `${getDateSlug()}:${slugPart}`;

@@ -11,7 +11,7 @@ const getAll = async () => {
   }
 };
 
-const post = async (request) => { 
+const post = async (request) => {
   const newUser = request.payload;
   newUser.password = bcrypt.hashSync(request.payload.password, 5);
   newUser.createdDate = Date.now();
@@ -24,7 +24,6 @@ const post = async (request) => {
     const savedUser = user.save();
     return h.response(savedUser).code(201); // eslint-disable-line
   } catch (error) {
-    console.log(error);
     return Boom.forbidden(error);
   }
 };

@@ -9,7 +9,7 @@ const register = async (server) => {
       auth: false,
       handler: ArticleCommentsService.get
     },
-  },]);
+  }]);
 };
 
 module.exports = {

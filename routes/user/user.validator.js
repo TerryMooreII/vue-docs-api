@@ -1,3 +1,5 @@
+const Boom = require('boom');
+const User = require('../../models/user');
 
 const verifyUniqueUser = async (request) => {
   // Find an entry from the database that

@@ -19,7 +19,7 @@ const getAll = async (request) => {
     }
   }
   const page = request.query.page &&
-    !isNaN(request.query.page) &&
+    !Number.isNaN(request.query.page) &&
     request.query.page > 1 ? request.query.page - 1 : 0;
 
   try {

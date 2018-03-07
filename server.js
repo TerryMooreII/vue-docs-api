@@ -69,14 +69,13 @@ async function start() {
     await server.register(Userinfo);
     await server.register(ArticleComments);
 
-    // Hoek.assert(!err, err);
     await server.start();
   } catch (err) {
-    console.log(err);
+    Hoek.assert(!err, err);
     process.exit(1);
   }
 
-  console.log('Server running at:', server.info.uri);
+  console.log('Server running at:', server.info.uri); // eslint-disable-line
 }
 
 start();
