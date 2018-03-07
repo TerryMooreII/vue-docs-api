@@ -12,9 +12,7 @@ const register = async (server) => {
   // Access JWT user info at request.auth.credentials
   server.auth.strategy('jwt', 'jwt', {
     key: secret,
-    validate: async (decoded, request) => {
-      return { isValid: true };
-    },
+    validate: async (decoded, request) => ({ isValid: true }),
     verifyOptions: {
       algorithms: ['HS256'],
     },
@@ -115,7 +113,7 @@ const oauthHandler = async (request, h) => {
   }
 
   return getOauthUser(request, h);
-}
+};
 
 async function getOauthUser(request, h) {
   const oauthId = `${request.auth.credentials.provider}|${request.auth.credentials.profile.id}`;
@@ -130,8 +128,8 @@ async function getOauthUser(request, h) {
         .lean()
         .exec();
 
-      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`)
-    } 
+      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`);
+    }
     let newUser = {};
 
     switch (request.auth.credentials.provider) {
@@ -181,7 +179,7 @@ async function getOauthUser(request, h) {
         .lean()
         .exec();
 
-      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`)
+      return h.redirect(`${redirectUrl}#id_token=${token.createToken(data)}`);
     } catch (error) {
       return Boom.forbidden(error); // HTTP 403
     }
