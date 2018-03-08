@@ -89,7 +89,7 @@ const loginHandler = async request => ({
   id_token: token.createToken(request.pre.user),
 });
 
-const logoutHandler = async (request, h) => h.response.code(204);
+const logoutHandler = async (request, h) => h.response().code(201);
 
 module.exports = {
   oauthHandler,

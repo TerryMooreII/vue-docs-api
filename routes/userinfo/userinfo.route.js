@@ -13,6 +13,19 @@ const register = async (server) => {
       handler: UserinfoService.get,
     },
   }]);
+
+  server.route([{
+    method: 'PUT',
+    path: '/users/me',
+    options: {
+      description: 'Update My info',
+      auth: {
+        strategy: 'jwt',
+        scope: ['user', 'admin', 'moderator'],
+      },
+      handler: UserinfoService.put,
+    },
+  }]);
 };
 
 module.exports = {

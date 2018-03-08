@@ -1,7 +1,7 @@
 const Boom = require('boom');
 const User = require('../../models/user');
 
-const get = async () => {
+const get = async (request) => {
   try {
     const id = request.auth.credentials._id; // eslint-disable-line
 
@@ -18,6 +18,16 @@ const get = async () => {
   }
 };
 
+const put = async (request) => {
+  try {
+    const user = User.findByIdAndUpdate(request.auth.credentials._id, request.payload); //eslint-disable-line
+    return user;
+  } catch (error) {
+    return Boom.forbidden(error); // HTTP 403
+  }
+};
+
 module.exports = {
-  get
+  get,
+  put
 };

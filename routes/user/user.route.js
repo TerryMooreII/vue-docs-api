@@ -6,8 +6,11 @@ const register = async (server) => {
     method: 'GET',
     path: '/users',
     options: {
-      description: 'Get Users',
-      auth: false,
+      description: 'Get All Users',
+      auth: {
+        strategy: 'jwt',
+        scope: ['admin']
+      },
       handler: UserService.getAll
     },
   }, {
