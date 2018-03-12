@@ -34,7 +34,7 @@ const getAll = async (request) => {
       return articles;
     }
     // return (votes - 1) / pow((item_hour_age+2), gravity)
-    const result = Article.aggregate([{
+    const result = await Article.aggregate([{
       $addFields: {
         // article: "$$ROOT",
         ranking: {
@@ -63,7 +63,7 @@ const getAll = async (request) => {
       .limit(request.query.count || itemsPerPage)
       .exec();
 
-    const articles = Article.populate(result, { path: 'submittedBy' });
+    const articles = await Article.populate(result, { path: 'submittedBy' });
 
     return articles;
   } catch (error) {
