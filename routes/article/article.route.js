@@ -43,7 +43,7 @@ const register = async (server) => {
       description: 'User required authorization',
       auth: {
         strategy: 'jwt',
-        scope: ['user', 'admin', 'moderator'],
+        scope: ['admin', 'moderator'],
       },
       handler: ArticleService.put,
     },

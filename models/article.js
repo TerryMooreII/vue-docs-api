@@ -14,6 +14,7 @@ const schema = new Schema({
   votes: Object,
   title: String,
   url: String,
+  text: String,
   version: String,
   commentCount: Number,
   isDeleted: Boolean,

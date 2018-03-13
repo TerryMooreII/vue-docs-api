@@ -71,13 +71,20 @@ const getAll = async (request) => {
   }
 };
 
-const get = async request => Article.findById(request.params.id).lean();
+const get = async request => Article.findById(request.params.id).lean().populate('submittedBy');
 
 const post = async (request, h) => {
   try {
     const article = new Article(request.payload);
-    twitter.tweet(article.title, article._id); // eslint-disable-line 
-    article.save();
+    await article.save();
+
+    if (request.payload.text) {
+      // Update the url with the article path
+      article.url = `https://vuenews.io/articles/${article._id}`; // eslint-disable-line
+      await article.save();
+    }
+
+    await twitter.tweet(article.title, article._id); // eslint-disable-line 
 
     return h.response(article).created(`/article/${article._id}`); // eslint-disable-line
   } catch (error) {
